@@ -1,0 +1,1 @@
+Place static assets here if needed (CSS, JS). The template uses CDN for Bootstrap.
