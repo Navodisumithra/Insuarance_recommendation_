@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+*.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints
+
+# PyCharm / IDEs
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# SQLite / DB
+*.sqlite3
+*.db
+
+# Models and data
+backend/models/
+backend/data/*.csv
+backend/data/*.json
+
+# Frontend build (if any)
+frontend/static/dist/
+frontend/node_modules/
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Cache
+*.cache
