@@ -11,46 +11,107 @@
   <h1 class="mb-4">Insurance Plan Recommender</h1>
   <form id="userForm">
     <div class="row g-3">
-      <div class="col-md-2"><label>Age</label><input class="form-control" name="Age" type="number" required></div>
-      <div class="col-md-2"><label>Gender</label>
+      <div class="col-md-2">
+        <label>Age</label>
+        <input class="form-control" name="Age" type="number" required>
+      </div>
+      <div class="col-md-2">
+        <label>Gender</label>
         <select class="form-control" name="Gender" required>
-          <option value=1>Male</option>
-          <option value=0>Female</option>
+          <option value="1">Male</option>
+          <option value="0">Female</option>
         </select>
       </div>
-      <div class="col-md-2"><label>MaritalStatus</label>
+      <div class="col-md-2">
+        <label>MaritalStatus</label>
         <select class="form-control" name="MaritalStatus" required>
-          <option value=0>Single</option>
-          <option value=1>Married</option>
+          <option value="0">Single</option>
+          <option value="1">Married</option>
         </select>
       </div>
-      <div class="col-md-3"><label>Occupation</label>
+      <div class="col-md-3">
+        <label>Occupation</label>
         <select class="form-control" name="Occupation" required>
-          <option>Government</option><option>Healthcare</option><option>Private Sector</option>
-          <option>Professional</option><option>Retail</option><option>Self-Employed</option>
-          <option>Student</option><option>Teacher</option><option>Tourism</option>
+          <option>Government</option>
+          <option>Healthcare</option>
+          <option>Private Sector</option>
+          <option>Professional</option>
+          <option>Retail</option>
+          <option>Self-Employed</option>
+          <option>Student</option>
+          <option>Teacher</option>
+          <option>Tourism</option>
         </select>
       </div>
-      <div class="col-md-3"><label>PreferredPaymentMode</label>
+      <div class="col-md-3">
+        <label>PreferredPaymentMode</label>
         <select class="form-control" name="PreferredPaymentMode" required>
-          <option>Monthly</option><option>Quarterly</option><option>Half-Annual</option><option>Annual</option>
+          <option>Monthly</option>
+          <option>Quarterly</option>
+          <option>Half-Annual</option>
+          <option>Annual</option>
         </select>
       </div>
 
-      <div class="col-md-3"><label>MonthlyIncomeLKR</label><input class="form-control" name="MonthlyIncomeLKR" type="number" required></div>
-      <div class="col-md-3"><label>BudgetPerMonthLKR</label><input class="form-control" name="BudgetPerMonthLKR" type="number" required></div>
-      <div class="col-md-2"><label>Smoker</label>
+      <div class="col-md-3">
+        <label>MonthlyIncomeLKR</label>
+        <input class="form-control" name="MonthlyIncomeLKR" type="number" required>
+      </div>
+      <div class="col-md-2">
+        <label>Smoker</label>
         <select class="form-control" name="Smoker" required>
-          <option value=0>No</option><option value=1>Yes</option>
+          <option value="0">No</option>
+          <option value="1">Yes</option>
         </select>
       </div>
-      <div class="col-md-2"><label>BMI</label><input class="form-control" name="BMI" type="number" step=0.1 required></div>
-      <div class="col-md-2"><label placeholder="illness">ChronicCondition</label>
-        <select class="form-control" name="ChronicCondition" required>
-          <option value=0>No</option><option value=1>Yes</option>
-        </select>
+
+      <!-- Weight / Height / BMI -->
+      <div class="col-md-2">
+        <label>Weight (kg)</label>
+        <input class="form-control" name="Weight" type="number" step="0.1" required>
       </div>
-      <div class="col-md-2"><label>NumChildren</label><input class="form-control" name="NumChildren" type="number" required></div>
+      <div class="col-md-2">
+        <label>Height (cm)</label>
+        <input class="form-control" name="Height" type="number" step="0.1" required>
+      </div>
+      <div class="col-md-2">
+        <label>BMI</label>
+        <input class="form-control" name="BMI" type="number" step="0.1" readonly>
+      </div>
+
+      <div class="col-md-2">
+        <label>NumChildren</label>
+        <input class="form-control" name="NumChildren" type="number" required>
+      </div>
+
+      <!-- Benefits Checkboxes -->
+      <div class="col-12">
+        <label>Benefits</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="Benefits" value="Hospital Bill Cover">
+          <label class="form-check-label">Hospital Bill Cover</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="Benefits" value="Life Cover">
+          <label class="form-check-label">Life Cover</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="Benefits" value="Disability Cover">
+          <label class="form-check-label">Disability Cover</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="Benefits" value="Accidental Death Cover">
+          <label class="form-check-label">Accidental Death Cover</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="Benefits" value="School Fee Cover">
+          <label class="form-check-label">School Fee Cover</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="Benefits" value="Spouse Cover">
+          <label class="form-check-label">Spouse Cover</label>
+        </div>
+      </div>
 
       <div class="col-12">
         <button type="button" id="predictBtn" class="btn btn-primary">Predict Plan</button>
@@ -65,17 +126,44 @@
 </div>
 
 <script>
+// Auto-calculate BMI
+document.querySelectorAll('[name="Weight"], [name="Height"]').forEach(input => {
+  input.addEventListener('input', () => {
+    const weight = parseFloat(document.querySelector('[name="Weight"]').value);
+    const height = parseFloat(document.querySelector('[name="Height"]').value) / 100;
+    const bmiField = document.querySelector('[name="BMI"]');
+    if (weight > 0 && height > 0) {
+      const bmi = (weight / (height * height)).toFixed(1);
+      bmiField.value = bmi;
+    } else {
+      bmiField.value = '';
+    }
+  });
+});
+
 document.getElementById('predictBtn').addEventListener('click', async () => {
   const form = document.getElementById('userForm');
   const formData = new FormData(form);
   const obj = { 'CustomerID': Date.now() };
-  for (let [k,v] of formData.entries()) {
-    if (!isNaN(v) && v !== '') v = Number(v);
-    obj[k] = v;
+
+  // Convert form values
+  for (let [key, value] of formData.entries()) {
+    if (key === "Benefits") {
+      if (!obj[key]) obj[key] = [];
+      obj[key].push(value);
+    } else if (!isNaN(value) && value !== '') {
+      obj[key] = Number(value);
+    } else {
+      obj[key] = value;
+    }
   }
 
+  const resultBox = document.getElementById('resultBox');
+  resultBox.className = 'alert alert-secondary';
+  resultBox.textContent = 'Predicting...';
+
   try {
-    const res = await fetch('/predict', {
+    const res = await fetch('http://127.0.0.1:5000/predict', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(obj)
@@ -89,25 +177,23 @@ document.getElementById('predictBtn').addEventListener('click', async () => {
     const data = await res.json();
 
     if (data.error) {
-      document.getElementById('resultBox').className = 'alert alert-danger';
-      document.getElementById('resultBox').textContent = data.error;
+      resultBox.className = 'alert alert-danger';
+      resultBox.textContent = data.error;
     } else {
-      const policy = data.PolicyDetails;
-      document.getElementById('resultBox').className = 'alert alert-success';
-      document.getElementById('resultBox').innerHTML = `
+      const policy = data.PolicyDetails || {};
+      resultBox.className = 'alert alert-success';
+      resultBox.innerHTML = `
         <strong>Plan:</strong> ${data.PredictedPlanName} (ID: ${data.PredictedPlanID})<br>
         <strong>Description:</strong> ${policy.Description || 'N/A'}<br>
         <strong>Coverage:</strong> ${policy.Coverage || 'N/A'}<br>
         <strong>Premium:</strong> ${policy.Premium || 'N/A'}
       `;
     }
-
   } catch (err) {
-    document.getElementById('resultBox').className = 'alert alert-danger';
-    document.getElementById('resultBox').textContent = err.message;
+    resultBox.className = 'alert alert-danger';
+    resultBox.textContent = err.message;
   }
 });
-
 </script>
 </body>
 </html>
