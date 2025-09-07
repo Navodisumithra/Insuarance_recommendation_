@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Dashboard - Insurance Predictor</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+body {
+  background: linear-gradient(135deg, #e0f7fa, #f3e5f5);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.navbar {
+  background: linear-gradient(135deg, #00796b, #6a1b9a);
+}
+.navbar-brand, .nav-link, .navbar-text { color: #fff !important; }
+.dashboard-container { padding: 30px; }
+.form-container {
+  background: #ffffffee;
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  box-shadow: 0px 8px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+  margin-top: 20px;
+}
+h2 {
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 20px;
+  background: linear-gradient(to right, #00796b, #6a1b9a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.btn-custom {
+  background: linear-gradient(135deg, #00796b, #6a1b9a);
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 12px 25px;
+}
+.btn-custom:hover {
+  background: linear-gradient(135deg, #004d40, #4a148c);
+  transform: scale(1.05);
+}
+.result-card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #f1f8e9;
+  border-left: 6px solid #00796b;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Submit Claim Button Styling */
+.btn-claim {
+  background-color: #FFD700; /* Yellow background */
+  color: black;              /* Black text */
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+}
+
+.btn-claim:hover {
+  background-color: #FFC300; /* Slightly darker yellow on hover */
+  color: black;
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#"><i class="fa-solid fa-shield-heart"></i> Insurance Predictor</a>
+    <div class="d-flex">
+      <!-- Register Button -->
+      <button class="btn btn-warning btn-sm me-2" onclick="window.location.href='register.html'">
+        <i class="fa-solid fa-pen-to-square"></i> Register
+      </button>
+
+      <!-- Claim Button (hidden initially) -->
+      <button id="claimNavBtn" class="btn btn-claim btn-sm me-2" onclick="claim()" style="display:none;">
+        <i class="fa-solid fa-file-invoice"></i> Claim
+      </button>
+
+      <!-- Logout Button -->
+      <button class="btn btn-danger btn-sm" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Dashboard Content -->
+<div class="container dashboard-container">
+  <h2>Welcome to Your Dashboard</h2>
+  <p class="text-center">Use the form below to predict your best insurance plan.</p>
+
+  <!-- Prediction Form -->
+  <div class="form-container">
+    <h2><i class="fa-solid fa-shield-heart"></i> Insurance Plan Predictor</h2>
+    <form id="userForm">
+      <div class="row g-3">
+        <!-- Age -->
+        <div class="col-md-4">
+          <label for="Age" class="form-label"><i class="fa-solid fa-user"></i> Age</label>
+          <input type="number" id="Age" name="Age" class="form-control" required>
+        </div>
+        <!-- Gender -->
+        <div class="col-md-4">
+          <label for="Gender" class="form-label"><i class="fa-solid fa-venus-mars"></i> Gender</label>
+          <select id="Gender" name="Gender" class="form-select" required>
+            <option value="" disabled selected>Select...</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <!-- Marital Status -->
+        <div class="col-md-4">
+          <label for="MaritalStatus" class="form-label"><i class="fa-solid fa-ring"></i> Marital Status</label>
+          <select id="MaritalStatus" name="MaritalStatus" class="form-select" required>
+            <option value="" disabled selected>Select...</option>
+            <option value="Single">Single</option>
+            <option value="Married">Married</option>
+          </select>
+        </div>
+        <!-- Monthly Income -->
+        <div class="col-md-6">
+          <label for="MonthlyIncome" class="form-label"><i class="fa-solid fa-sack-dollar"></i> Monthly Income</label>
+          <input type="number" id="MonthlyIncome" name="MonthlyIncome" class="form-control" required>
+        </div>
+        <!-- Occupation -->
+        <div class="col-md-6">
+          <label for="Occupation" class="form-label"><i class="fa-solid fa-briefcase"></i> Occupation</label>
+          <select id="Occupation" name="Occupation" class="form-select" required>
+            <option value="" disabled selected>Select...</option>
+            <option value="Government">Government</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Private Sector">Private Sector</option>
+            <option value="Professional">Professional</option>
+            <option value="Retail">Retail</option>
+            <option value="Self-Employed">Self-Employed</option>
+            <option value="Student">Student</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Tourism">Tourism</option>
+          </select>
+        </div>
+        <!-- Smoker -->
+        <div class="col-md-6">
+          <label for="Smoker" class="form-label"><i class="fa-solid fa-smoking"></i> Smoker</label>
+          <select id="Smoker" name="Smoker" class="form-select" required>
+            <option value="" disabled selected>Select...</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+        <!-- Weight -->
+        <div class="col-md-6">
+          <label for="Weight" class="form-label"><i class="fa-solid fa-weight-scale"></i> Weight (kg)</label>
+          <input type="number" id="Weight" name="Weight" class="form-control" required>
+        </div>
+        <!-- Height -->
+        <div class="col-md-6">
+          <label for="Height" class="form-label"><i class="fa-solid fa-ruler-vertical"></i> Height (cm)</label>
+          <input type="number" id="Height" name="Height" class="form-control" required>
+        </div>
+        <!-- BMI -->
+        <div class="col-md-6">
+          <label for="BMI" class="form-label"><i class="fa-solid fa-heart-pulse"></i> BMI</label>
+          <input type="number" id="BMI" name="BMI" class="form-control" readonly>
+        </div>
+        <!-- Number of Children -->
+        <div class="col-md-6">
+          <label for="NumChildren" class="form-label"><i class="fa-solid fa-children"></i> Children</label>
+          <input type="number" id="NumChildren" name="NumChildren" class="form-control" required>
+        </div>
+        <!-- Payment Mode -->
+        <div class="col-md-6">
+          <label for="PreferredPaymentMode" class="form-label"><i class="fa-solid fa-credit-card"></i> Payment Mode</label>
+          <select id="PreferredPaymentMode" name="PreferredPaymentMode" class="form-select" required>
+            <option value="" disabled selected>Select...</option>
+            <option value="Monthly">Monthly</option>
+            <option value="Quarterly">Quarterly</option>
+            <option value="Half-Annual">Half-Annual</option>
+            <option value="Annual">Annual</option>
+          </select>
+        </div>
+        <!-- Benefits -->
+        <div class="col-md-12">
+          <label class="form-label"><i class="fa-solid fa-list-check"></i> Benefits</label>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="Benefits" value="Hospital Bill Cover">
+                <label class="form-check-label">Hospital Bill Cover</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="Benefits" value="Life Cover">
+                <label class="form-check-label">Life Cover</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="Benefits" value="Disability Cover">
+                <label class="form-check-label">Disability Cover</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="Benefits" value="Accident Cover">
+                <label class="form-check-label">Accident Cover</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="Benefits" value="Critical Illness Cover">
+                <label class="form-check-label">Critical Illness Cover</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="Benefits" value="Maternity Cover">
+                <label class="form-check-label">Maternity Cover</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <button type="button" class="btn btn-custom" onclick="submitForm()">
+          <i class="fa-solid fa-magic"></i> Predict Plan
+        </button>
+      </div>
+    </form>
+
+    <!-- Result Box -->
+    <div id="resultBox" style="display:none;"></div>
+
+  </div>
+</div>
+
+<script>
+// JWT Auth check
+const token = localStorage.getItem('userToken');
+if (!token) {
+  alert('Please login first!');
+  window.location.href = 'index.html';
+}
+
+// Logout
+function logout() {
+  localStorage.removeItem('userToken');
+  window.location.href = 'index.html';
+}
+
+// Auto BMI
+document.querySelectorAll('[name="Weight"], [name="Height"]').forEach(input => {
+  input.addEventListener('input', () => {
+    const weight = parseFloat(document.querySelector('[name="Weight"]').value);
+    const height = parseFloat(document.querySelector('[name="Height"]').value) / 100;
+    const bmiField = document.querySelector('[name="BMI"]');
+    bmiField.value = (weight > 0 && height > 0) ? (weight / (height * height)).toFixed(1) : '';
+  });
+});
+
+function submitForm() {
+  const form = document.getElementById('userForm');
+  const formData = new FormData(form);
+  const obj = { 'CustomerID': Date.now() };
+
+  const genderMap = { "Male":0, "Female":1, "Other":2 };
+  const maritalMap = { "Single":0, "Married":1 };
+  const smokerMap = { "No":0, "Yes":1 };
+  const paymentMap = { "Monthly":0, "Quarterly":1, "Half-Annual":2, "Annual":3 };
+  const occupationMap = { "Government":0, "Healthcare":1, "Private Sector":2, "Professional":3,
+    "Retail":4, "Self-Employed":5, "Student":6, "Teacher":7, "Tourism":8 };
+
+  for (let [key,value] of formData.entries()) {
+    if(key==="Benefits") {
+      if(!obj[key]) obj[key]=[];
+      obj[key].push(value);
+    } else if(!isNaN(value) && value!=='') obj[key] = Number(value);
+    else obj[key] = value;
+  }
+
+  if(obj["Gender"]) obj["Gender"]=genderMap[obj["Gender"]];
+  if(obj["MaritalStatus"]) obj["MaritalStatus"]=maritalMap[obj["MaritalStatus"]];
+  if(obj["Smoker"]) obj["Smoker"]=smokerMap[obj["Smoker"]];
+  if(obj["PreferredPaymentMode"]) obj["PreferredPaymentMode"]=paymentMap[obj["PreferredPaymentMode"]];
+  if(obj["Occupation"]) obj["Occupation"]=occupationMap[obj["Occupation"]];
+  if(obj.Benefits && Array.isArray(obj.Benefits)) obj.Benefits=obj.Benefits.join(', ');
+
+  const resultBox = document.getElementById('resultBox');
+  resultBox.style.display='block';
+  resultBox.className='result-card alert alert-secondary';
+  resultBox.innerHTML=`<div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div> Predicting...`;
+
+  fetch('http://127.0.0.1:5000/predict', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify(obj)
+  })
+  .then(res=>res.json().catch(()=>({error:'Server error'})))
+  .then(data=>{
+    if(data.error){
+      resultBox.className='result-card alert alert-danger';
+      resultBox.textContent=data.error;
+    } else {
+      const policy=data.PolicyDetails||{};
+      resultBox.className='result-card alert alert-success';
+      resultBox.innerHTML=`
+        <strong>Plan:</strong> ${data.PredictedPlanName} (ID: ${data.PredictedPlanID})<br>
+        <strong>Description:</strong> ${policy.Description||'N/A'}<br>
+        <strong>Coverage:</strong> ${policy.Coverage||'N/A'}<br>
+        <strong>Premium:</strong> ${policy.Premium||'N/A'}
+      `;
+      // ✅ Show the navbar Claim button
+      document.getElementById('claimNavBtn').style.display = 'inline-block';
+    }
+  })
+  .catch(err=>{
+    resultBox.className='result-card alert alert-danger';
+    resultBox.textContent=err.message||'Server error';
+  });
+}
+
+// ✅ Show the navbar Claim button
+      const claimBtn = document.getElementById('claimNavBtn');
+      if(claimBtn) claimBtn.style.display = 'block';  // Use block for navbar button
+
+// Redirect to claim page
+function claim() {
+  window.location.href = 'claim.html';
+}
+
+</script>
+</body>
+</html>
