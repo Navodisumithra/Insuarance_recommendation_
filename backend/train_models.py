@@ -52,5 +52,6 @@ def main():
 
     print("Artifacts saved to", OUT_DIR)
 
+
 if __name__ == "__main__":
     main()

@@ -311,7 +311,6 @@ def get_admins(decoded):
         if 'cursor' in locals(): cursor.close()
         if 'conn' in locals() and conn.is_connected(): conn.close()
 
-
 # ----------------- Run -----------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

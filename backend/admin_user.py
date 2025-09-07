@@ -107,6 +107,7 @@ def login():
 def dashboard(decoded):
     return jsonify({'message': f"Welcome Admin ID {decoded['id']}!"})
 
+
 # ----------------- Run Server -----------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -120,6 +120,7 @@ def fetch_all_predictions():
     if not conn:
         return []
     cursor = None
+    
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM user_inputs ORDER BY id DESC")
