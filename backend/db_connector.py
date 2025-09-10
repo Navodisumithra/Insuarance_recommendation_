@@ -2,6 +2,8 @@ import mysql.connector
 from mysql.connector import Error
 import json
 
+
+# ----------------- DB Configuration -----------------
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
@@ -9,6 +11,7 @@ DB_CONFIG = {
     'database': 'insurance_db'
 }
 
+# ----------------- Connect to MySQL -----------------
 def get_connection():
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
@@ -18,12 +21,17 @@ def get_connection():
         print("Error connecting to MySQL:", e)
         return None
 
+# ----------------- Save User Prediction/Input -----------------
 def save_user_data(data):
+    """
+    Save user's input data into the user_inputs table
+    """
     conn = get_connection()
     if not conn:
         print("Failed to connect to DB. Data not saved.")
         return
 
+    cursor = None
     try:
         cursor = conn.cursor()
 
@@ -38,18 +46,18 @@ def save_user_data(data):
         benefits_json = json.dumps(data.get('Benefits', []))
 
         values = (
-            data.get('CustomerID'),
-            data.get('Age'),
-            data.get('Gender'),
-            data.get('MaritalStatus'),
-            data.get('Occupation'),
-            data.get('PreferredPaymentMode'),
-            data.get('MonthlyIncomeLKR'),
-            data.get('Smoker'),
-            data.get('Weight'),
-            data.get('Height'),
-            data.get('BMI'),
-            data.get('NumChildren'),
+            data.get('CustomerID', 0),
+            data.get('Age', 0),
+            data.get('Gender', 0),
+            data.get('MaritalStatus', 0),
+            data.get('Occupation', ''),
+            data.get('PreferredPaymentMode', ''),
+            data.get('MonthlyIncomeLKR', 0.0), # Use default to prevent NULL error
+            data.get('Smoker', 0),
+            data.get('Weight', 0.0),
+            data.get('Height', 0.0),
+            data.get('BMI', 0.0),
+            data.get('NumChildren', 0),
             benefits_json
         )
 
@@ -61,5 +69,67 @@ def save_user_data(data):
         print("Error saving data to MySQL:", e)
     
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            cursor.close()
+        if conn.is_connected():
+            conn.close()
+
+# ----------------- Fetch All Users -----------------
+def fetch_all_users():
+    conn = get_connection()
+    if not conn:
+        return []
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id, name, email FROM users")
+        data = cursor.fetchall()
+        return data
+    except Error as e:
+        print("Error fetching users:", e)
+        return []
+    finally:
+        if cursor:
+            cursor.close()
+        if conn.is_connected():
+            conn.close()
+
+# ----------------- Fetch All Admins -----------------
+def fetch_all_admins():
+    conn = get_connection()
+    if not conn:
+        return []
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id, username, email FROM admin_users")
+        data = cursor.fetchall()
+        return data
+    except Error as e:
+        print("Error fetching admins:", e)
+        return []
+    finally:
+        if cursor:
+            cursor.close()
+        if conn.is_connected():
+            conn.close()
+
+# ----------------- Fetch All User Predictions -----------------
+def fetch_all_predictions():
+    conn = get_connection()
+    if not conn:
+        return []
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM user_inputs ORDER BY id DESC")
+        data = cursor.fetchall()
+        return data
+    except Error as e:
+        print("Error fetching predictions:", e)
+        return []
+    finally:
+        if cursor:
+            cursor.close()
+        if conn.is_connected():
+            conn.close()
