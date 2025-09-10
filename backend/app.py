@@ -12,7 +12,17 @@ BASE_DIR = os.path.dirname(__file__)
 app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "../frontend/templates"))
 
 # Broad CORS support
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app, resources={
+    r"/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization"],
+    # Do not enable supports_credentials when using a wildcard origin ('*').
+    # Browsers will reject responses that include Access-Control-Allow-Credentials: true together with Access-Control-Allow-Origin: '*'.
+    # If you need to send credentials, replace '*' with a specific origin (e.g. 'http://localhost:5000') and set supports_credentials to True.
+    "supports_credentials": False
+    }
+})
 app.config['SECRET_KEY'] = '12336547896655'
 app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, "uploads")
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -190,6 +200,9 @@ def admin_register():
         hashed_pw = bcrypt.hashpw(raw_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         conn = get_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+            
         cursor = conn.cursor()
         cursor.execute("INSERT INTO admin_users (username, email, password) VALUES (%s, %s, %s)",
                        (username, email, hashed_pw))
@@ -214,6 +227,9 @@ def user_register():
         hashed_pw = bcrypt.hashpw(raw_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         conn = get_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+            
         cursor = conn.cursor()
         cursor.execute("INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
                        (name, email, hashed_pw))
@@ -229,14 +245,22 @@ def user_register():
 
 # ----------------- Login -----------------
 @app.route('/login', methods=['POST', 'OPTIONS'])
+@app.route('/auth', methods=['POST', 'OPTIONS'])  # Alternative endpoint
 @cross_origin()
 def login():
     if request.method == 'OPTIONS': return '', 204
+    
+    conn = None
+    cursor = None
+    
     try:
         data = request.get_json(force=True)
         email, raw_password = data.get('email'), data.get('password')
 
         conn = get_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+
         cursor = conn.cursor(dictionary=True)
 
         cursor.execute("SELECT * FROM admin_users WHERE email=%s", (email,))
@@ -260,10 +284,31 @@ def login():
             app.config['SECRET_KEY'], algorithm='HS256'
         )
 
+        # Let flask-cors manage the CORS headers. Return the token normally.
         return jsonify({'token': token, 'role': role, 'message': 'Login successful'})
+
+    except Exception as e:
+        print(f"Login error: {e}")
+        return jsonify({'error': 'Login failed'}), 500
+
     finally:
-        if 'cursor' in locals(): cursor.close()
-        if 'conn' in locals() and conn.is_connected(): conn.close()
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
+
+# ----------------- Frontend Routes -----------------
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    return render_template('admin_dashboard.html')
+
+@app.route('/user_dashboard')
+def user_dashboard():
+    return render_template('user_dashboard.html')
 
 # ----------------- Register Page -----------------
 @app.route('/register', methods=['GET'])
@@ -299,16 +344,19 @@ def insurance_register():
         file.save(file_path)
 
         conn = get_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+            
         cursor = conn.cursor()
-        cursor.execute("SELECT id FROM insurance_register WHERE NIC=%s", (form.get('NIC'),))
+        cursor.execute("SELECT id FROM insurance_register WHERE nic=%s", (form.get('NIC'),))
         if cursor.fetchone():
             return jsonify({'error': 'NIC already registered'}), 400
 
         cursor.execute("""
             INSERT INTO insurance_register 
-            (BranchName, FullName, Citizenship, NIC, Birthday, Age, MonthlyIncome, Email,
-             Children, InsurancePlan, Benefit, Relationship, PaymentMethod, BankName,
-             AccountHolder, AccountNumber, Signature, Witness, Date)
+            (branch_name, full_name, citizenship, nic, birthday, age, monthly_income, email,
+             children, insurance_plan, benefit, relationship, payment_method, bank_name,
+             account_holder, account_number, signature, witness, register_date)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             form.get('BranchName'), form.get('FullName'), form.get('Citizenship'), form.get('NIC'),
