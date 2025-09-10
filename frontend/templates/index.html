@@ -134,7 +134,11 @@
 
 
   <script>
-    let tempEmail = '';
+  // Set this to your backend address. When frontend is served from a different server (WAMP/Apache),
+  // using absolute API URLs prevents requests from going to the frontend host by mistake.
+  const API_BASE_URL = 'http://127.0.0.1:5000';
+
+  let tempEmail = '';
     let tempPassword = '';
     let tempName = '';
 
@@ -159,7 +163,7 @@
         return;
       }
 
-      fetch('/user_register', {
+  fetch(API_BASE_URL + '/user_register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: tempName, email: tempEmail, password: tempPassword })
@@ -190,7 +194,7 @@
         return;
       }
 
-      fetch('/login', {  // use unified /login route
+  fetch(API_BASE_URL + '/login', {  // use unified /login route
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -210,9 +214,9 @@
 
             setTimeout(() => {
               if (data.role === 'admin') {
-                window.location.href = '/admin_dashboard'; // admin dashboard
+                window.location.href = '/frontend/templates/admin_dashboard'; // admin dashboard
               } else {
-                window.location.href = '/user_dashboard'; // user dashboard
+                window.location.href = '/frontend/templates/user_dashboard'; // user dashboard
               }
             }, 1500);
           }
@@ -224,4 +228,4 @@
   </script>
 </body>
 
-</html>
+</html>s

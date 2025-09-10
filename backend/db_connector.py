@@ -7,8 +7,8 @@ import json
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': '',
-    'database': 'insurance _db'
+    'password': '1234',
+    'database': 'insurance_db'
 }
 
 # ----------------- Connect to MySQL -----------------
