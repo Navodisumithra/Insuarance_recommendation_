@@ -47,3 +47,4 @@ build/
 
 # Cache
 *.cache
+__temp_pipreqsnb_folder/_pipreqsnb_temp_file.py
